@@ -1,9 +1,10 @@
 #!/usr/bin/python
 
 import numpy as np
+import yaml
 
 
-def dijkstras(occupancy_map,x_spacing,y_spacing,start,goal):
+def dijkstras(occupancy_map, x_spacing, y_spacing, start, goal):
     """
     Implements Dijkstra's shortest path algorithm
     Input:
@@ -19,6 +20,19 @@ def dijkstras(occupancy_map,x_spacing,y_spacing,start,goal):
         starting with "start" and ending with "end" (each node is in
         metric coordinates)
     """
+    path = []
+    print "Start: ", start
+    print "goal: ", goal[0], goal[1]
+    startx = (start.item(0)/x_spacing) - 0.5
+    starty = (start.item(1)/y_spacing) - 0.5
+    position = [startx, starty]
+    path.append(position)
+    print "First entry: ", path[0]
+    print "x spacing: ", x_spacing
+    print "y spacing: ", y_spacing
+
+    path = np.array(path)
+    return path
     pass
 
 def test():
@@ -135,20 +149,21 @@ def test_for_grader():
 
 
 def main():
-    # Load parameters from yaml
-    param_path = 'params.yaml' # rospy.get_param("~param_path")
-    f = open(param_path,'r')
-    params_raw = f.read()
-    f.close()
-    params = yaml.load(params_raw)
-    # Get params we need
-    occupancy_map = np.array(params['occupancy_map'])
-    pos_init = np.array(params['pos_init'])
-    pos_goal = np.array(params['pos_goal'])
-    x_spacing = params['x_spacing']
-    y_spacing = params['y_spacing']
-    path = dijkstras(occupancy_map,x_spacing,y_spacing,pos_init,pos_goal)
-    print(path)
+    test()
+    # # Load parameters from yaml
+    # param_path = 'params.yaml' # rospy.get_param("~param_path")
+    # f = open(param_path,'r')
+    # params_raw = f.read()
+    # f.close()
+    # params = yaml.load(params_raw)
+    # # Get params we need
+    # occupancy_map = np.array(params['occupancy_map'])
+    # pos_init = np.array(params['pos_init'])
+    # pos_goal = np.array(params['pos_goal'])
+    # x_spacing = params['x_spacing']
+    # y_spacing = params['y_spacing']
+    # path = dijkstras(occupancy_map,x_spacing,y_spacing,pos_init,pos_goal)
+    # print(path)
 
 if __name__ == '__main__':
     main()
