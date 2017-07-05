@@ -4,7 +4,7 @@ import numpy as np
 import yaml
 import math
 from operator import itemgetter
-import heapq
+
 
 
 
@@ -91,8 +91,7 @@ def dijkstras(occupancy_map, x_spacing, y_spacing, start, goal):
     path = []
     position = [start.item(0), start.item(1)] #starting point passed in by function
     path.append(position) #add it to the list for the path
-    for i in range(0, nearest_node[0]):
-        position =
+
     print "Pathhhhh: ", path
     # position = [(x+0.5)*x_spacing, (y+0.5)*y_spacing]
     # path.append(position)
