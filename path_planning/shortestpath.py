@@ -3,6 +3,8 @@
 import numpy as np
 import yaml
 import math
+from operator import itemgetter
+import heapq
 
 
 
@@ -47,22 +49,30 @@ def dijkstras(occupancy_map, x_spacing, y_spacing, start, goal):
     col = x
 
     possible_nodes[row][col] = 1 #This means the starting node has been searched.
-    print possible_nodes
+    print "Possible Nodes: ", possible_nodes
 
     # The g_value will count the number of steps each node is from the start.
     # Since we are at the start node, the total cost is 0.
     g_value = 0
     open_nodes = [[g_value, col, row]] # dist, x, y
+    searched_nodes = []
 
     while len(open_nodes) != 0:
         open_nodes.sort(reverse=True) #sort from shortest distance to farthest
         nearest_node = open_nodes.pop()
+        print "meow: ", nearest_node
+        searched_nodes.append(nearest_node)
+        print "mooo: ", searched_nodes
         if nearest_node[1] == goalX and nearest_node[2] == goalY:
             print "Goal found!"
-            print possible_nodes
-            print open_nodes
+            print "NEAREST NODE: ", nearest_node
+            print "searched_nodes: \n", searched_nodes
+            print "\n"
+            print sorted(searched_nodes, key = itemgetter(0))
+            break
         g_value, col, row = nearest_node
         print "current g, col, row:", g_value, col, row
+        print "While Possible Nodes: ", possible_nodes
         for i in delta:
             possible_expansion_x = col + i[0]
             possible_expansion_y = row + i[1]
@@ -76,32 +86,17 @@ def dijkstras(occupancy_map, x_spacing, y_spacing, start, goal):
                     open_nodes.append([g_value + cost, possible_expansion_x, possible_expansion_y])
                     print "open_nodes", open_nodes
 
+    print "Generating path..."
 
-
-
-
-
-
-
-
-
-    # path = []
-    # validpath = False #found
-    # nopath = False #resign
-    # step = 1 #how far each step is in the grid representation. Cost.
-    # delta = [[-1, 0],  # go up
-    #          [0, -1],  # go left
-    #          [1, 0],  # go down
-    #          [0, 1]]  # go right
-    #
-    # g = 0 #this is how many grid "steps" away each node is from the start node.
-    #
-    # open_nodes = [[step, x, y]] #This is a list that captures each of the initial
-    #
-    # position = [start[0], start[0]] #starting point passed in by function
-    # path.append(position) #add it to the list for the path
+    path = []
+    position = [start.item(0), start.item(1)] #starting point passed in by function
+    path.append(position) #add it to the list for the path
+    for i in range(0, nearest_node[0]):
+        position =
+    print "Pathhhhh: ", path
     # position = [(x+0.5)*x_spacing, (y+0.5)*y_spacing]
     # path.append(position)
+
 
 def test():
     """
@@ -124,14 +119,14 @@ def test():
     goal1 = np.array([[0.6], [1], [0]])
     path1 = dijkstras(test_map1,x_spacing1,y_spacing1,start1,goal1)
     true_path1 = np.array([
-        [ 0.3  ,  0.3  ],
-        [ 0.325,  0.3  ],
-        [ 0.325,  0.5  ],
-        [ 0.325,  0.7  ],
-        [ 0.455,  0.7  ],
-        [ 0.455,  0.9  ],
-        [ 0.585,  0.9  ],
-        [ 0.600,  1.0  ]
+        [ 0.3  ,  0.3  ], # [2,1]
+        [ 0.325,  0.3  ], # [2,1]
+        [ 0.325,  0.5  ], # [2,2]
+        [ 0.325,  0.7  ], # [2,3]
+        [ 0.455,  0.7  ], # [3,3]
+        [ 0.455,  0.9  ], # [3,4]
+        [ 0.585,  0.9  ], # [4,4]
+        [ 0.600,  1.0  ]  # [5,5]
         ])
     if np.array_equal(path1,true_path1):
       print("Path 1 passes")
