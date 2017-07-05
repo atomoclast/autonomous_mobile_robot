@@ -22,80 +22,59 @@ def dijkstras(occupancy_map, x_spacing, y_spacing, start, goal):
         starting with "start" and ending with "end" (each node is in
         metric coordinates)
     """
-    path = []
-    validpath = False #found
-    nopath = False #resign
-    step = 1 #how far each step is in the grid representation. Cost.
+    # We will use this delta function to search surrounding nodes.
     delta = [[-1, 0],  # go up
              [0, -1],  # go left
              [1, 0],  # go down
              [0, 1]]  # go right
 
-    g = 0 #this is how many grid "steps" away each node is from the start node.
-    x = int(math.ceil((start.item(0)/x_spacing) - 0.5)) #startingx
-    y = int(math.ceil((start.item(1)/y_spacing) - 0.5)) #startingy
-    goalX = int(math.ceil((goal.item(0)/x_spacing)-0.5))
-    goalY = int(math.ceil((goal.item(1)/y_spacing)-0.5))
-    open_nodes = [[step, x, y]] #This is a list that captures each of the initial
-    print "x, y", x, y, type(x), type(y)
+    # Each node on the map "costs" 1 step to reach.
+    cost = 1
+    # Convert numpy array of map to list of map, makes it easier to search.
+    occ_map = occupancy_map.tolist()
 
-    position = [start[0], start[0]] #starting point passed in by function
-    path.append(position) #add it to the list for the path
-    position = [(x+0.5)*x_spacing, (y+0.5)*y_spacing]
-    path.append(position)
+    # Converge start and goal positions to map indices.
+    x = int(math.ceil((start.item(0) / x_spacing) - 0.5))  # startingx
+    y = int(math.ceil((start.item(1) / y_spacing) - 0.5))  # startingy
+    goalX = int(math.ceil((goal.item(0) / x_spacing) - 0.5))
+    goalY = int(math.ceil((goal.item(1) / y_spacing) - 0.5))
+    print "Start Pose: ", x, y
+    print "Goal Pose: ", goalX, goalY
 
-    # print "First entry: ", path[1]
-    # print "Map location: ", startx, starty
-    # print len(occupancy_map[1,:])
-    # print len(occupancy_map[:,1])
+    # Make a map to keep track of all the nodes and their cost distance values.
+    possible_nodes = [[0 for row in range(len(occ_map[0]))] for col in range(len(occ_map[1]))]
+    row = y
+    col = x
 
-    #closed in example
-    searched = [[0 for row in range(len(occupancy_map[1,:]))] for col in range(len(occupancy_map[:,1]))]
-    searched[y][x] = 1 #remember, j = rows, i = colomns
+    possible_nodes[row][col] = 1 #This means the starting node has been searched.
+    print possible_nodes
 
+    # The g_value will count the number of steps each node is from the start.
+    # Since we are at the start node, the total cost is 0.
+    g_value = 0
+    open_nodes = [[g_value, col, row]] # dist, x, y
 
+    while len(open_nodes) != 0:
+        open_nodes.sort(reverse=True) #sort from shortest distance to farthest
+        nearest_node = open_nodes.pop()
+        if nearest_node[1] == goalX and nearest_node[2] == goalY:
+            print "Goal found!"
+            print possible_nodes
+            print open_nodes
+        g_value, col, row = nearest_node
+        print "current g, col, row:", g_value, col, row
+        for i in delta:
+            possible_expansion_x = col + i[0]
+            possible_expansion_y = row + i[1]
+            valid_expansion = 0 <= possible_expansion_x < len(occupancy_map[0]) and 0 <= possible_expansion_y < len(occ_map)
 
-    while validpath == False  and nopath ==False:
-        if len(open_nodes) == 0: #empty, nothing to search through
-            nopath = True
-            print "No valid path found..."
-            path = np.zeros(shape=(1, 2))  # return back a zero path
-            return path
-
-        else:
-            #remove node from list
-            open_nodes.sort(reverse=True) #Sorts from lowest to highest values of g
-            next = open_nodes.pop()
-            print 'take list item'
-            print next
-            x = next[1]
-            y = next[2]
-            g = next[0]
-
-
-
-            #check if goal value:
-
-            if x == goalX and y == goalY:
-                validpath = True
-                print "Valid path found!"
-                position = [(x + 0.5) * x_spacing, (y + 0.5) * y_spacing]
-                path.append(position)
-                path = np.array(path)
-                return path
-
-            else:
-                #if not the goal...continue expanding out in every direction
-                for i in range(len(moves)):
-                    print "moves: ", moves[0][i]
-                    x2 = x + moves[0][i]
-                    y2 = y + moves[i][1]
-
-                    if x2 >=0 and x2 < len(searched[0]) and y2 >= 0 and y2 < len(searched):
-                        if searched[x2][y2] == 0 and occupancy_map[y2][x2] == 0:
-                            g2 = g + step
-                            open_nodes.append([g2,x2,y2])
-                            searched[x2][y2] = 1
+            if valid_expansion:
+                unsearched_node = possible_nodes[possible_expansion_x][possible_expansion_y] == 0
+                open_node = occ_map[possible_expansion_x][possible_expansion_y] == 0
+                if unsearched_node and open_node:
+                    possible_nodes[possible_expansion_x][possible_expansion_y] = 1
+                    open_nodes.append([g_value + cost, possible_expansion_x, possible_expansion_y])
+                    print "open_nodes", open_nodes
 
 
 
@@ -106,7 +85,23 @@ def dijkstras(occupancy_map, x_spacing, y_spacing, start, goal):
 
 
 
-    # pass
+    # path = []
+    # validpath = False #found
+    # nopath = False #resign
+    # step = 1 #how far each step is in the grid representation. Cost.
+    # delta = [[-1, 0],  # go up
+    #          [0, -1],  # go left
+    #          [1, 0],  # go down
+    #          [0, 1]]  # go right
+    #
+    # g = 0 #this is how many grid "steps" away each node is from the start node.
+    #
+    # open_nodes = [[step, x, y]] #This is a list that captures each of the initial
+    #
+    # position = [start[0], start[0]] #starting point passed in by function
+    # path.append(position) #add it to the list for the path
+    # position = [(x+0.5)*x_spacing, (y+0.5)*y_spacing]
+    # path.append(position)
 
 def test():
     """
