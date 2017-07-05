@@ -4,6 +4,8 @@ import numpy as np
 import yaml
 import math
 from operator import itemgetter
+import heapq
+import pprint
 
 
 
@@ -49,19 +51,22 @@ def dijkstras(occupancy_map, x_spacing, y_spacing, start, goal):
     col = x
 
     possible_nodes[row][col] = 1 #This means the starting node has been searched.
-    print "Possible Nodes: ", possible_nodes
+    print "Possible Nodes: "
+    pprint.pprint(possible_nodes)
 
     # The g_value will count the number of steps each node is from the start.
     # Since we are at the start node, the total cost is 0.
     g_value = 0
-    open_nodes = [[g_value, col, row]] # dist, x, y
+    open_nodes = [(g_value, col, row)] # dist, x, y
     searched_nodes = []
+    loopcount = 0
 
     while len(open_nodes) != 0:
+        print "\n>>>>>>>>>>>>LOOP COUNT: ", loopcount, "\n"
         open_nodes.sort(reverse=True) #sort from shortest distance to farthest
         nearest_node = open_nodes.pop()
         print "meow: ", nearest_node
-        searched_nodes.append(nearest_node)
+        heapq.heappush(searched_nodes, nearest_node)
         print "mooo: ", searched_nodes
         if nearest_node[1] == goalX and nearest_node[2] == goalY:
             print "Goal found!"
@@ -72,7 +77,6 @@ def dijkstras(occupancy_map, x_spacing, y_spacing, start, goal):
             break
         g_value, col, row = nearest_node
         print "current g, col, row:", g_value, col, row
-        print "While Possible Nodes: ", possible_nodes
         for i in delta:
             possible_expansion_x = col + i[0]
             possible_expansion_y = row + i[1]
@@ -83,8 +87,11 @@ def dijkstras(occupancy_map, x_spacing, y_spacing, start, goal):
                 open_node = occ_map[possible_expansion_x][possible_expansion_y] == 0
                 if unsearched_node and open_node:
                     possible_nodes[possible_expansion_x][possible_expansion_y] = 1
-                    open_nodes.append([g_value + cost, possible_expansion_x, possible_expansion_y])
-                    print "open_nodes", open_nodes
+                    open_nodes.append((g_value + cost, possible_expansion_x, possible_expansion_y))
+                    print "added_nodes:", open_nodes
+                    print "While Possible Nodes: "
+                    pprint.pprint(possible_nodes)
+        loopcount = loopcount+1
 
     print "Generating path..."
 
@@ -93,6 +100,14 @@ def dijkstras(occupancy_map, x_spacing, y_spacing, start, goal):
     path.append(position) #add it to the list for the path
 
     print "Pathhhhh: ", path
+    print "Pop POP: "
+    print heapq.heappop(searched_nodes)
+    print heapq.heappop(searched_nodes)
+    print heapq.heappop(searched_nodes)
+    print heapq.heappop(searched_nodes)
+    print heapq.heappop(searched_nodes)
+    print heapq.heappop(searched_nodes)
+    print heapq.heappop(searched_nodes)
     # position = [(x+0.5)*x_spacing, (y+0.5)*y_spacing]
     # path.append(position)
 
