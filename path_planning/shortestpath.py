@@ -114,7 +114,7 @@ def dijkstras(occupancy_map, x_spacing, y_spacing, start, goal):
         route.sort()
 
     # Convert route back to metric units:
-
+    print "Route: ", route
     path = []
     position = [start.item(0), start.item(1)] #starting point passed in by function
     path.append(position) #add it to the list for the path
@@ -155,48 +155,49 @@ def test():
     goal1 = np.array([[0.6], [1], [0]])
     path1 = dijkstras(test_map1,x_spacing1,y_spacing1,start1,goal1)
     true_path1 = np.array([
-        [ 0.3  ,  0.3  ], # [2,1]
-        [ 0.325,  0.3  ], # [2,1]
-        [ 0.325,  0.5  ], # [2,2]
-        [ 0.325,  0.7  ], # [2,3]
-        [ 0.455,  0.7  ], # [3,3]
-        [ 0.455,  0.9  ], # [3,4]
-        [ 0.585,  0.9  ], # [4,4]
-        [ 0.600,  1.0  ]  # [5,5]
+        [ 0.3  ,  0.3  ],  # [2,1]
+        [ 0.325,  0.3  ],  # [2,1]
+        [ 0.325,  0.5  ],  # [2,2]
+        [ 0.325,  0.7  ],  # [2,3]
+        [ 0.455,  0.7  ],  # [3,3]
+        [ 0.455,  0.9  ],  # [3,4]
+        [ 0.585,  0.9  ],  # [4,4]
+        [ 0.600,  1.0  ]   # [5,5]
         ])
     if np.array_equal(path1,true_path1):
       print("Path 1 passes")
     else:
         print "nope, chuck testa"
 
-    # test_map2 = np.array([
-    #          [0, 0, 0, 0, 0, 0, 0, 0],
-    #          [0, 0, 0, 0, 0, 0, 0, 0],
-    #          [0, 0, 0, 0, 0, 0, 0, 0],
-    #          [1, 1, 1, 1, 1, 1, 1, 1],
-    #          [1, 0, 0, 1, 1, 0, 0, 1],
-    #          [1, 0, 0, 1, 1, 0, 0, 1],
-    #          [1, 0, 0, 1, 1, 0, 0, 1],
-    #          [1, 0, 0, 0, 0, 0, 0, 1],
-    #          [1, 0, 0, 0, 0, 0, 0, 1],
-    #          [1, 1, 1, 1, 1, 1, 1, 1]])
-    # start2 = np.array([[0.5], [1.0], [1.5707963267948966]])
-    # goal2 = np.array([[1.1], [0.9], [-1.5707963267948966]])
-    # x_spacing2 = 0.2
-    # y_spacing2 = 0.2
-    # path2 = dijkstras(test_map2,x_spacing2,y_spacing2,start2,goal2)
-    # true_path2 = np.array([[ 0.5,  1.0],
-    #                        [ 0.5,  1.1],
-    #                        [ 0.5,  1.3],
-    #                        [ 0.5,  1.5],
-    #                        [ 0.7,  1.5],
-    #                        [ 0.9,  1.5],
-    #                        [ 1.1,  1.5],
-    #                        [ 1.1,  1.3],
-    #                        [ 1.1,  1.1],
-    #                        [ 1.1,  0.9]])
-    # if np.array_equal(path2,true_path2):
-    #   print("Path 2 passes")
+    test_map2 = np.array([
+             [0, 0, 0, 0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0, 0, 0, 0],
+             [1, 1, 1, 1, 1, 1, 1, 1],
+             [1, 0, 0, 1, 1, 0, 0, 1],
+             [1, 0, 0, 1, 1, 0, 0, 1],
+             [1, 0, 0, 1, 1, 0, 0, 1],
+             [1, 0, 0, 0, 0, 0, 0, 1],
+             [1, 0, 0, 0, 0, 0, 0, 1],
+             [1, 1, 1, 1, 1, 1, 1, 1]])
+    start2 = np.array([[0.5], [1.0], [1.5707963267948966]])
+    goal2 = np.array([[1.1], [0.9], [-1.5707963267948966]])
+    x_spacing2 = 0.2
+    y_spacing2 = 0.2
+    path2 = dijkstras(test_map2,x_spacing2,y_spacing2,start2,goal2)
+    true_path2 = np.array([[ 0.5,  1.0],  # [2, 5]
+                           [ 0.5,  1.1],  # [2, 5]
+                           [ 0.5,  1.3],  # [2, 6]
+                           [ 0.5,  1.5],  # [2, 7]
+                           [ 0.7,  1.5],  # [3, 7]
+                           [ 0.9,  1.5],  # [4, 7]
+                           [ 1.1,  1.5],  # [5, 7]
+                           [ 1.1,  1.3],  # [5, 7]
+                           [ 1.1,  1.1],  # [5, 6]
+                           [ 1.1,  0.9]   # [5, 4]
+                           ])
+    if np.array_equal(path2,true_path2):
+      print("Path 2 passes")
 
 def test_for_grader():
     """
