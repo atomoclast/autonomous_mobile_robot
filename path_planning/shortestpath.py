@@ -57,59 +57,81 @@ def dijkstras(occupancy_map, x_spacing, y_spacing, start, goal):
     # The g_value will count the number of steps each node is from the start.
     # Since we are at the start node, the total cost is 0.
     g_value = 0
-    open_nodes = [(g_value, col, row)] # dist, x, y
+    frontier_nodes = [(g_value, col, row)] # dist, x, y
     searched_nodes = []
+    parent_node = {}  # Dictionary that Maps {child node : parent node}
     loopcount = 0
 
-    while len(open_nodes) != 0:
+    while len(frontier_nodes) != 0:
         print "\n>>>>>>>>>>>>LOOP COUNT: ", loopcount, "\n"
-        open_nodes.sort(reverse=True) #sort from shortest distance to farthest
-        nearest_node = open_nodes.pop()
-        print "meow: ", nearest_node
-        heapq.heappush(searched_nodes, nearest_node)
-        print "mooo: ", searched_nodes
-        if nearest_node[1] == goalX and nearest_node[2] == goalY:
+        frontier_nodes.sort(reverse=True) #sort from shortest distance to farthest
+        current_node = frontier_nodes.pop()
+        print "current_node: ", current_node
+        heapq.heappush(searched_nodes, current_node)
+        print "frontier nodes: ", searched_nodes
+        if current_node[1] == goalX and current_node[2] == goalY:
             print "Goal found!"
-            print "NEAREST NODE: ", nearest_node
+            print "NEAREST NODE: ", current_node
             print "searched_nodes: \n", searched_nodes
             print "\n"
             print sorted(searched_nodes, key = itemgetter(0))
             break
-        g_value, col, row = nearest_node
+        g_value, col, row = current_node
         print "current g, col, row:", g_value, col, row
+
+        # Check surrounding neighbors.
         for i in delta:
             possible_expansion_x = col + i[0]
             possible_expansion_y = row + i[1]
             valid_expansion = 0 <= possible_expansion_x < len(occupancy_map[0]) and 0 <= possible_expansion_y < len(occ_map)
+            print "Current expansion Node: ", possible_expansion_x, possible_expansion_y
 
             if valid_expansion:
-                unsearched_node = possible_nodes[possible_expansion_x][possible_expansion_y] == 0
-                open_node = occ_map[possible_expansion_x][possible_expansion_y] == 0
+                try:
+                    unsearched_node = possible_nodes[possible_expansion_x][possible_expansion_y] == 0
+                    open_node = occ_map[possible_expansion_x][possible_expansion_y] == 0
+                except:
+                    unsearched_node = False
                 if unsearched_node and open_node:
                     possible_nodes[possible_expansion_x][possible_expansion_y] = 1
-                    open_nodes.append((g_value + cost, possible_expansion_x, possible_expansion_y))
-                    print "added_nodes:", open_nodes
+                    possible_node = (g_value + cost, possible_expansion_x, possible_expansion_y)
+                    frontier_nodes.append(possible_node)
+                    print "frontier_nodes:", frontier_nodes
+                    # This now builds parent/child relationship
+                    parent_node[possible_node] = current_node
+                    print "Parent Node: \n", parent_node
                     print "While Possible Nodes: "
                     pprint.pprint(possible_nodes)
         loopcount = loopcount+1
 
     print "Generating path..."
 
+    route = []
+    child_node = current_node
+    while parent_node.has_key(child_node):
+        route.append(parent_node[child_node])
+        child_node = parent_node[child_node]
+        route.sort()
+
+    # Convert route back to metric units:
+
     path = []
     position = [start.item(0), start.item(1)] #starting point passed in by function
     path.append(position) #add it to the list for the path
 
-    print "Pathhhhh: ", path
-    print "Pop POP: "
-    print heapq.heappop(searched_nodes)
-    print heapq.heappop(searched_nodes)
-    print heapq.heappop(searched_nodes)
-    print heapq.heappop(searched_nodes)
-    print heapq.heappop(searched_nodes)
-    print heapq.heappop(searched_nodes)
-    print heapq.heappop(searched_nodes)
-    # position = [(x+0.5)*x_spacing, (y+0.5)*y_spacing]
-    # path.append(position)
+    for i in range(0, len(route)):
+        position = [(route[i][1]+0.5)*x_spacing, (route[i][2]+0.5)*y_spacing ]
+        path.append(position)
+
+    # Add the goal state:
+
+    position = [goal.item(0), goal.item(1)]
+    path.append(position)
+
+    print "Pathh: "
+    pprint.pprint(path)
+    path = np.array(path)
+    return path
 
 
 def test():
@@ -229,6 +251,7 @@ def test_for_grader():
 
 def main():
     test()
+
     # # Load parameters from yaml
     # param_path = 'params.yaml' # rospy.get_param("~param_path")
     # f = open(param_path,'r')
