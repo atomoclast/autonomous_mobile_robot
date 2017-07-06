@@ -128,7 +128,7 @@ def dijkstras(occupancy_map, x_spacing, y_spacing, start, goal):
     path.append(position)  # Add it to the list for the path
 
     for i in range(0, len(route)):
-        position = [round((route[i][1]+0.5)*x_spacing, 2), round((route[i][2]+0.5)*y_spacing, 2)]
+        position = [round((route[i][1]+0.5)*x_spacing, 3), round((route[i][2]+0.5)*y_spacing, 3)]
         path.append(position)
 
     # Add the goal state:
@@ -148,47 +148,47 @@ def test():
     """
     Function that provides a few examples of maps and their solution paths
     """
-    # test_map1 = np.array([
-    #           [1, 1, 1, 1, 1, 1, 1, 1],
-    #           [1, 0, 0, 0, 0, 0, 0, 1],
-    #           [1, 0, 0, 0, 0, 0, 0, 1],
-    #           [1, 0, 0, 0, 0, 0, 0, 1],
-    #           [1, 0, 0, 0, 0, 0, 0, 1],
-    #           [1, 0, 0, 0, 0, 0, 0, 1],
-    #           [1, 0, 0, 0, 0, 0, 0, 1],
-    #           [1, 0, 0, 0, 0, 0, 0, 1],
-    #           [1, 0, 0, 0, 0, 0, 0, 1],
-    #           [1, 1, 1, 1, 1, 1, 1, 1]])
-    # x_spacing1 = 0.13
-    # y_spacing1 = 0.2
-    # start1 = np.array([[0.3], [0.3], [0]])
-    # goal1 = np.array([[0.6], [1], [0]])
-    # path1 = dijkstras(test_map1,x_spacing1,y_spacing1,start1,goal1)
-    # true_path1 = np.array([
-    #     # [ 0.3  ,  0.3  ],  # [2,1]
-    #     # [ 0.325,  0.3  ],  # [2,1]
-    #     # [ 0.325,  0.5  ],  # [2,2]
-    #     # [ 0.325,  0.7  ],  # [2,3]
-    #     # [ 0.455,  0.7  ],  # [3,3]
-    #     # [ 0.455,  0.9  ],  # [3,4]
-    #     # [ 0.585,  0.9  ],  # [4,4]
-    #     # [ 0.600,  1.0  ]   # [5,5]
-    #
-    #      [0.3, 0.3],
-    #      [0.325, 0.30000000000000004],
-    #      [0.325, 0.5],
-    #      [0.325, 0.7000000000000001],
-    #      [0.325, 0.9],
-    #      [0.325, 1.1],
-    #      [0.455, 1.1],
-    #      [0.585, 1.1],
-    #      [0.6, 1.0]
-    #
-    # ])
-    # if np.array_equal(path1,true_path1):
-    #   print("Path 1 passes")
-    # else:
-    #     print "nope, chuck testa"
+    test_map1 = np.array([
+              [1, 1, 1, 1, 1, 1, 1, 1],
+              [1, 0, 0, 0, 0, 0, 0, 1],
+              [1, 0, 0, 0, 0, 0, 0, 1],
+              [1, 0, 0, 0, 0, 0, 0, 1],
+              [1, 0, 0, 0, 0, 0, 0, 1],
+              [1, 0, 0, 0, 0, 0, 0, 1],
+              [1, 0, 0, 0, 0, 0, 0, 1],
+              [1, 0, 0, 0, 0, 0, 0, 1],
+              [1, 0, 0, 0, 0, 0, 0, 1],
+              [1, 1, 1, 1, 1, 1, 1, 1]])
+    x_spacing1 = 0.13
+    y_spacing1 = 0.2
+    start1 = np.array([[0.3], [0.3], [0]])
+    goal1 = np.array([[0.6], [1], [0]])
+    path1 = dijkstras(test_map1,x_spacing1,y_spacing1,start1,goal1)
+    true_path1 = np.array([
+        # [ 0.3  ,  0.3  ],  # [2,1]
+        # [ 0.325,  0.3  ],  # [2,1]
+        # [ 0.325,  0.5  ],  # [2,2]
+        # [ 0.325,  0.7  ],  # [2,3]
+        # [ 0.455,  0.7  ],  # [3,3]
+        # [ 0.455,  0.9  ],  # [3,4]
+        # [ 0.585,  0.9  ],  # [4,4]
+        # [ 0.600,  1.0  ]   # [5,5]
+
+         [0.3, 0.3],
+         [0.325, 0.3],
+         [0.325, 0.5],
+         [0.325, 0.7],
+         [0.325, 0.9],
+         [0.325, 1.1],
+         [0.455, 1.1],
+         [0.585, 1.1],
+         [0.6, 1.0]
+
+    ])
+    if np.array_equal(path1,true_path1):
+      print("Path 1 passes")
+    else:
+        print "nope, chuck testa"
 
     test_map2 = np.array([
              [0, 0, 0, 0, 0, 0, 0, 0],
@@ -242,11 +242,11 @@ def test_for_grader():
     start1 = np.array([[1.5], [1.5], [0]])
     goal1 = np.array([[7.5], [1], [0]])
     path1 = dijkstras(test_map1,x_spacing1,y_spacing1,start1,goal1)
-    s = 0
+    t = 0
     for i in range(len(path1)-1):
-      s += np.sqrt((path1[i][0]-path1[i+1][0])**2 + (path1[i][1]-path1[i+1][1])**2)
+      t += np.sqrt((path1[i][0]-path1[i+1][0])**2 + (path1[i][1]-path1[i+1][1])**2)
     print("Path 1 length:")
-    print(s)
+    print(t)
 
 
     test_map2 = np.array([
@@ -268,17 +268,18 @@ def test_for_grader():
     s = 0
     for i in range(len(path2)-1):
       s += np.sqrt((path2[i][0]-path2[i+1][0])**2 + (path2[i][1]-path2[i+1][1])**2)
+    print("Path 1 length:")
+    print(t)
     print("Path 2 length:")
     print(s)
 
 
 
 def main():
-    test()
-
+    test_for_grader()
     # # Load parameters from yaml
     # param_path = 'params.yaml' # rospy.get_param("~param_path")
-    # f = open(param_path,'r')
+    # f = open('params.yaml','r')
     # params_raw = f.read()
     # f.close()
     # params = yaml.load(params_raw)
