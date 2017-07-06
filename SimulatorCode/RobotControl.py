@@ -18,7 +18,7 @@ import matplotlib.pyplot as plt
 # from ros_interface import ROSInterface
 
 # TODO for student: User files, uncomment as completed
-#from MyShortestPath import dijkstras
+from path_planner import dijkstras
 #from KalmanFilter import KalmanFilter
 #from DiffDriveController import DiffDriveController
 
