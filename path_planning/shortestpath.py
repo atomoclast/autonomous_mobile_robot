@@ -4,11 +4,7 @@ import numpy as np
 import yaml
 import math
 from operator import itemgetter
-import heapq
 import pprint
-
-
-
 
 def dijkstras(occupancy_map, x_spacing, y_spacing, start, goal):
     """
@@ -48,11 +44,15 @@ def dijkstras(occupancy_map, x_spacing, y_spacing, start, goal):
     print "Goal Pose: ", goalX, goalY
 
     # Make a map to keep track of all the nodes and their cost distance values.
-    possible_nodes = [[0 for row in range(len(occ_map[0]))] for col in range(len(occ_map[1]))]
+    possible_nodes = [[0 for row in range(len(occ_map[0]))] for col in range(len(occ_map))]
     row = y
     col = x
 
-    possible_nodes[row][col] = 1 #This means the starting node has been searched.
+    # Show the starting node and goal node.
+    # 5 looks similar to S and 6 looks similar to G.
+    possible_nodes[row][col] = 5
+    possible_nodes[goalY][goalX] = 6
+
     print "Possible Nodes: "
     pprint.pprint(possible_nodes)
 
@@ -69,7 +69,6 @@ def dijkstras(occupancy_map, x_spacing, y_spacing, start, goal):
         frontier_nodes.sort(reverse=True) #sort from shortest distance to farthest
         current_node = frontier_nodes.pop()
         print "current_node: ", current_node
-        heapq.heappush(searched_nodes, current_node)
         print "frontier nodes: ", searched_nodes
         if current_node[1] == goalX and current_node[2] == goalY:
             print " %%%%%%%%%%%%% Goal found!"
@@ -85,21 +84,24 @@ def dijkstras(occupancy_map, x_spacing, y_spacing, start, goal):
         for i in delta:
             possible_expansion_x = col + i[0]
             possible_expansion_y = row + i[1]
-            print "map dims: ", occupancy_map[0], len(occ_map)
-            valid_expansion = 0 <= possible_expansion_x < len(occupancy_map[0]) and 0 <= possible_expansion_y < len(occ_map)
+            print "map dims: ", len(occupancy_map[0]), len(occ_map)
+            valid_expansion = 0 <= possible_expansion_y < len(occupancy_map[0]) and 0 <= possible_expansion_x < len(occ_map)
             print "Current expansion Node: ", possible_expansion_x, possible_expansion_y
 
             if valid_expansion:
                 try:
                     unsearched_node = possible_nodes[possible_expansion_x][possible_expansion_y] == 0
                     open_node = occ_map[possible_expansion_x][possible_expansion_y] == 0
+                    print "Check Open or Wall: ", occ_map[possible_expansion_x][possible_expansion_y]
                 except:
                     unsearched_node = False
                 if unsearched_node and open_node:
-                    possible_nodes[possible_expansion_x][possible_expansion_y] = 1
+                    # Using  instead of 1 to make it easier to read This node has been searched.
+                    possible_nodes[possible_expansion_x][possible_expansion_y] = 3
                     possible_node = (g_value + cost, possible_expansion_x, possible_expansion_y)
                     frontier_nodes.append(possible_node)
                     print "frontier_nodes:", frontier_nodes
+
                     # This now builds parent/child relationship
                     parent_node[possible_node] = current_node
                     print "Parent Node: \n", parent_node
@@ -119,8 +121,8 @@ def dijkstras(occupancy_map, x_spacing, y_spacing, start, goal):
     # Convert route back to metric units:
     print "Route: ", route
     path = []
-    position = [start.item(0), start.item(1)] #starting point passed in by function
-    path.append(position) #add it to the list for the path
+    position = [start.item(0), start.item(1)]  # Starting point passed in by function
+    path.append(position)  # Add it to the list for the path
 
     for i in range(0, len(route)):
         position = [(route[i][1]+0.5)*x_spacing, (route[i][2]+0.5)*y_spacing ]
@@ -131,8 +133,10 @@ def dijkstras(occupancy_map, x_spacing, y_spacing, start, goal):
     position = [goal.item(0), goal.item(1)]
     path.append(position)
 
-    print "Pathh: "
+    print "Path: "
     pprint.pprint(path)
+
+    # Convert to numpy array and return.
     path = np.array(path)
     return path
 
