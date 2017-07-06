@@ -51,7 +51,7 @@ def dijkstras(occupancy_map, x_spacing, y_spacing, start, goal):
     # Show the starting node and goal node.
     # 5 looks similar to S and 6 looks similar to G.
     possible_nodes[row][col] = 5
-    possible_nodes[goalY][goalX] = 6
+    # possible_nodes[goalY][goalX] = 6
 
     print "Possible Nodes: "
     pprint.pprint(possible_nodes)
@@ -90,14 +90,17 @@ def dijkstras(occupancy_map, x_spacing, y_spacing, start, goal):
 
             if valid_expansion:
                 try:
-                    unsearched_node = possible_nodes[possible_expansion_x][possible_expansion_y] == 0
-                    open_node = occ_map[possible_expansion_x][possible_expansion_y] == 0
-                    print "Check Open or Wall: ", occ_map[possible_expansion_x][possible_expansion_y]
+                    unsearched_node = possible_nodes[possible_expansion_y][possible_expansion_x] == 0
+                    open_node = occ_map[possible_expansion_y][possible_expansion_x] == 0
+                    print "Check Open or Wall: ", occ_map[possible_expansion_y][possible_expansion_x]
                 except:
                     unsearched_node = False
+                    open_node = False
                 if unsearched_node and open_node:
                     # Using  instead of 1 to make it easier to read This node has been searched.
-                    possible_nodes[possible_expansion_x][possible_expansion_y] = 3
+                    # searched_row = possible_expansion_y
+                    # searched_col = possible_expansion_x
+                    possible_nodes[possible_expansion_y][possible_expansion_x] = 3
                     possible_node = (g_value + cost, possible_expansion_x, possible_expansion_y)
                     frontier_nodes.append(possible_node)
                     print "frontier_nodes:", frontier_nodes
@@ -118,14 +121,14 @@ def dijkstras(occupancy_map, x_spacing, y_spacing, start, goal):
         child_node = parent_node[child_node]
         route.sort()
 
-    # Convert route back to metric units:
+    #  route back to metric units:
     print "Route: ", route
     path = []
     position = [start.item(0), start.item(1)]  # Starting point passed in by function
     path.append(position)  # Add it to the list for the path
 
     for i in range(0, len(route)):
-        position = [(route[i][1]+0.5)*x_spacing, (route[i][2]+0.5)*y_spacing ]
+        position = [round((route[i][1]+0.5)*x_spacing, 2), round((route[i][2]+0.5)*y_spacing, 2)]
         path.append(position)
 
     # Add the goal state:
@@ -214,6 +217,8 @@ def test():
                            [ 1.1,  1.1],  # [5, 5]
                            [ 1.1,  0.9]   # [5, 4]
                            ])
+
+
     if np.array_equal(path2,true_path2):
       print("Path 2 passes")
 
