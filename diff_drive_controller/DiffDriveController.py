@@ -16,6 +16,7 @@ class DiffDriveController():
         self.MAX_SPEED = max_speed
         self.MAX_OMEGA = max_omega
 
+        # Characteristic Polynomial: 
         # (lambda + kp)(lambda^2 + (ka - kp)*lambda - kp*kb) = 0
 
 
@@ -38,20 +39,12 @@ class DiffDriveController():
 
         delta_x = goal[0] - state[0]
         delta_y = goal[1] - state[1]
-        print "delta x and y: ", delta_x, delta_y, "\n"
 
         rho = np.sqrt(np.square(delta_x) + np.square(delta_y))
-        print "rho ", rho, "\n"
 
-        #alpha = (goal[2]-state[2])
         alpha = -state[2] + np.arctan2(delta_y,delta_x)
         print "alpha ", alpha, "\n"
 
-        # delta_x = rho * np.cos(alpha + state[2])
-        # delta_y = rho * np.sin(alpha + state[2])
-        # print "delta x and y: ", delta_x, delta_y, "\n"
-
-        # beta = -np.arctan2(delta_y,delta_x)
         beta = - state[2] - alpha
         print "beta: ", beta, "\n"
 
