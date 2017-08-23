@@ -13,7 +13,7 @@ You can ssh via WiFi by running:
 `ssh pi@192.168.0.55`
 Password: `raspberry`
 
-## Running the Robo:
+## Running the Robot:
 In two termianls run: 
 `roslaunch robot_launch robot.launch`
 
