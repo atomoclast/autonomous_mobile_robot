@@ -34,50 +34,37 @@ class DiffDriveController():
         done - a boolean value specifying if the robot has reached its goal (or
             is close enough
         """
-        # Calculate the magnitude of error:
 
-        delta_x = goal[0] - state[0]
-        delta_y = goal[1] - state[1]
+        KP = self.kp
+        KA = self.ka
+        KB = self.kb
+        delx = goal[0] - state[0]
+        dely = goal[1] - state[1]
+        theta = state[2]
+        tworoots = np.roots([1, KA - KP, -KP * KB])
+        w = [-KP, tworoots[0], tworoots[1]]
+        # if w[0]<0 and w[1]<0 and w[2]<0:
+        p = np.sqrt((delx ** 2) + (dely ** 2))
+        print(p)
+        alpha = -theta + np.arctan2(dely, delx)
+        beta = -theta - alpha
 
-        rho = np.sqrt(np.square(delta_x) + np.square(delta_y))
-
-        alpha = -state[2] + np.arctan2(delta_y,delta_x)
-        # print "alpha ", alpha, "\n"
-
-        beta = - state[2] - alpha
-        # print "beta: ", beta, "\n"
-
-        # Check if state is close enough to goal. If not:
-        # Use calculated to develop an acceptable velocity and omega value.
-
-        gain_matrix  = np.matrix([[self.kp, 0, 0], [0, self.ka, self.kb]])
-        # print gain_matrix
-        # print "\n"
-
-        error_matrix = np.matrix([[rho], [alpha], [beta]])
-        # print error_matrix
-        # print "\n"
-
-        vel_omega = np.matmul(gain_matrix, error_matrix)
-        # print "lin and ang vel: ", vel_omega, "\n"
-
-        if vel_omega[0] > self.MAX_SPEED:
+        v = p * KP
+        if np.all(v > self.MAX_SPEED):
             v = self.MAX_SPEED
-        else:
-            v = vel_omega[0]
 
-        if vel_omega[1] > self.MAX_OMEGA:
+        omega = (alpha * KA) + (beta * KB)
+        if np.all(omega > self.MAX_OMEGA):
             omega = self.MAX_OMEGA
-        else:
-            omega = vel_omega[1]
 
-        if delta_x < self.error_tol and delta_y < self.error_tol:
+        if np.all(p < 0.15):
             done = True
         else:
             done = False
 
-        return v, omega, done
-
+        vw = (v, omega, done)
+        print("vw: ", vw)
+        return vw
 
 
 if __name__ == '__main__':
