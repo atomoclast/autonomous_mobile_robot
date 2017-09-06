@@ -9,7 +9,9 @@ You can ssh via ethernet cable by running:
 `ssh pi@10.1.10.55`
 Password: `raspberry`
 
-You can ssh via WiFi by running: 
+Using the `ssh` argument `-Y` will allow for GUI windows to be shown.
+
+You can ssh via WiFi by running:
 `ssh pi@192.168.0.55`
 Password: `raspberry`
 
