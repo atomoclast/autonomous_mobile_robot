@@ -78,8 +78,9 @@ class RobotControl(object):
         # TODO for student: Comment this when running on the robot 
         meas = self.robot_sim.get_measurements()
         imu_meas = self.robot_sim.get_imu()
-
-        print("Measurements: ", meas)
+        print "IMU Data: ", imu_meas
+        print "IMU Type: ", type(imu_meas)
+        print "First element: ", imu_meas[1]
         if meas != None:
             goal = np.array([0.5, 1.0])
             state = np.array([meas[0], meas[1], meas[2]])
