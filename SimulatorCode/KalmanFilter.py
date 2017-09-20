@@ -91,6 +91,7 @@ class KalmanFilter:
                                         [omega * dt]])
 
         self.P_t_prediction = (G.dot(self.P_t)).dot(np.transpose(G)) + (N.dot(self.Q_t)).dot(np.transpose(N))
+        print "Predict P T: \n", self.P_t_prediction
         return (self.x_t_prediction, self.P_t_prediction)
 
     def update(self, z_t):
@@ -109,18 +110,19 @@ class KalmanFilter:
         """
          
         H = np.eye(3)
-        K = (self.P_t_prediction.dot(np.transpose(H))).dot(
-            inv((H.dot(self.P_t_prediction)).dot(np.transpose(H)) + self.R_t))
+        print "PT PREDICT: ", self.P_t_prediction, type(self.P_t_prediction)
+        K = (self.P_t_prediction.dot(np.transpose(H))).dot(inv((H.dot(self.P_t_prediction)).dot(np.transpose(H)) + self.R_t))
+
 
         print "Z_T: ", z_t, type(z_t)
 
         if z_t != None and z_t != []:
 
-            for i in range(z_t):
+            for tag in z_t:
                 # retrieve pose of the tag in world frame from the map(markers)
-                tag_w_pose = self.tag_pos(z_t[i, 3])
+                tag_w_pose = self.tag_pos(tag[3])
                 # pose of the tag as measured from the robot
-                tag_r_pose = z_t[i, :3]
+                tag_r_pose = tag[:3]
                 # pose of the robot in the world frame
                 robot_pose = self.robot_pos(tag_w_pose, tag_r_pose)
 

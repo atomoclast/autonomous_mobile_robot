@@ -63,7 +63,6 @@ class DiffDriveController():
             done = False
         vw = None
         vw = (v, omega, done)
-        print "Controller Fun VW: ", vw
         return vw
 
 
