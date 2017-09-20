@@ -27,7 +27,7 @@ class KalmanFilter:
             moment
         """
         self.markers = markers
-        self.last_time = None  # Used to keep track of time between measurements 
+        self.last_time = 0.0 # None  # Used to keep track of time between measurements
         self.Q_t = np.eye(2)
         self.R_t = np.eye(3)
 
@@ -62,33 +62,33 @@ class KalmanFilter:
         # G = df/dx
         # N = df/dn
         # Coursera's way
-        if omega == 0:
-            G = np.eye(3) + dt * np.array([[0, 0, -v[0] * np.sin(self.x_t[2, 0])],
-                                           [0, 0, v[0] * np.cos(self.x_t[2, 0])], [0, 0, 0]])
-
-            N = dt * np.array([[-np.sin(self.x_t[2, 0]), 0], [np.cos(self.x_t[2, 0]), 0], [0, 1]])
-            self.x_t_prediction = self.x_t + dt * np.array(
-                [[v[0] * np.cos(self.x_t[2, 0])], [v[0] * np.sin(self.x_t[2, 0])], [omega]])
-        else:
-            # Thurn's way
-            G = np.eye(3) + np.array([[0, 0, -(v[0] / omega * np.cos(self.x_t[2, 0])) + (
-            v[0] / omega * np.cos(self.x_t[2, 0] + omega * dt))],
-                                      [0, 0, -(v[0] / omega * np.sin(self.x_t[2, 0])) + (
-                                      v[0] / omega * np.sin(self.x_t[2, 0] + omega * dt))],
-                                      [0, 0, 0]])
-            N = np.array([[(-np.sin(self.x_t[2, 0]) + np.sin(self.x_t[2, 0] + omega * dt)) / omega,
-                           (v[0] * (np.sin(self.x_t[2, 0]) - np.sin(self.x_t[2, 0] + omega * dt)) / (omega ** 2)) +
-                           (v[0] * (np.cos(self.x_t[2, 0] + omega * dt) * dt) / omega)],
-                          [(np.cos(self.x_t[2, 0]) - np.cos(self.x_t[2, 0] + omega * dt)) / omega,
-                           (-v[0] * (np.cos(self.x_t[2, 0]) - np.cos(self.x_t[2, 0] + omega * dt)) / (omega ** 2)) +
-                           (v[0] * (np.sin(self.x_t[2, 0] + omega * dt) * dt) / omega)],
-                          [0, dt]]);
-            self.x_t_prediction = self.x_t + \
-                                  np.array([[-(v[0] / omega * np.sin(self.x_t[2, 0])) + (
-                                  v[0] / omega * np.sin(self.x_t[2, 0] + omega * dt))],
-                                            [(v[0] / omega * np.cos(self.x_t[2, 0])) - (
-                                            v[0] / omega * np.cos(self.x_t[2, 0] + omega * dt))],
-                                            [omega * dt]])
+        # if omega == 0.0:
+        #     G = np.eye(3) + dt * np.array([[0, 0, -v[0] * np.sin(self.x_t[2, 0])],
+        #                                    [0, 0, v[0] * np.cos(self.x_t[2, 0])], [0, 0, 0]])
+        #
+        #     N = dt * np.array([[-np.sin(self.x_t[2, 0]), 0], [np.cos(self.x_t[2, 0]), 0], [0, 1]])
+        #     self.x_t_prediction = self.x_t + dt * np.array(
+        #         [[v[0] * np.cos(self.x_t[2, 0])], [v[0] * np.sin(self.x_t[2, 0])], [omega]])
+        # else:
+        #     # Thurn's way
+        print "Predict: \n", self.x_t
+        print "V: \n", v
+        G = np.eye(3) + np.array([[0, 0, -(v[0] / omega * np.cos(self.x_t[2, 0])) + (v[0] / omega * np.cos(self.x_t[2, 0] + omega * dt))],
+                                  [0, 0, -(v[0] / omega * np.sin(self.x_t[2, 0])) + (v[0] / omega * np.sin(self.x_t[2, 0] + omega * dt))],
+                                  [0, 0, 0]])
+        N = np.array([[(-np.sin(self.x_t[2, 0]) + np.sin(self.x_t[2, 0] + omega * dt)) / omega,
+                       (v[0] * (np.sin(self.x_t[2, 0]) - np.sin(self.x_t[2, 0] + omega * dt)) / (omega ** 2)) +
+                       (v[0] * (np.cos(self.x_t[2, 0] + omega * dt) * dt) / omega)],
+                      [(np.cos(self.x_t[2, 0]) - np.cos(self.x_t[2, 0] + omega * dt)) / omega,
+                       (-v[0] * (np.cos(self.x_t[2, 0]) - np.cos(self.x_t[2, 0] + omega * dt)) / (omega ** 2)) +
+                       (v[0] * (np.sin(self.x_t[2, 0] + omega * dt) * dt) / omega)],
+                      [0, dt]]);
+        self.x_t_prediction = self.x_t + \
+                              np.array([[-(v[0] / omega * np.sin(self.x_t[2, 0])) + (
+                              v[0] / omega * np.sin(self.x_t[2, 0] + omega * dt))],
+                                        [(v[0] / omega * np.cos(self.x_t[2, 0])) - (
+                                        v[0] / omega * np.cos(self.x_t[2, 0] + omega * dt))],
+                                        [omega * dt]])
 
         self.P_t_prediction = (G.dot(self.P_t)).dot(np.transpose(G)) + (N.dot(self.Q_t)).dot(np.transpose(N))
         return (self.x_t_prediction, self.P_t_prediction)
@@ -112,9 +112,11 @@ class KalmanFilter:
         K = (self.P_t_prediction.dot(np.transpose(H))).dot(
             inv((H.dot(self.P_t_prediction)).dot(np.transpose(H)) + self.R_t))
 
-        if z_t != None and z_t.any():
+        print "Z_T: ", z_t, type(z_t)
 
-            for i in range(z_t.shape[0]):
+        if z_t != None and z_t != []:
+
+            for i in range(z_t):
                 # retrieve pose of the tag in world frame from the map(markers)
                 tag_w_pose = self.tag_pos(z_t[i, 3])
                 # pose of the tag as measured from the robot
