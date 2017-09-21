@@ -82,30 +82,29 @@ class RobotControl(object):
         # print "meas: ", meas
         # self.robot_sim.command_velocity(.5, .3)
 
+        vw = [0.2, -0.05, False]
+        self.robot_sim.command_velocity(vw[0], vw[1])
+        
         if meas != None and meas != []:
             print("Measurements: ", meas)
             state = np.array([0.0, 0.0, 0.0])
             goal = np.array([meas[0][0], meas[0][1], meas[0][2]])
+        
+            if imu_meas != None:
+                self.kalman_filter.prediction(vw, imu_meas)
+                self.kalman_filter.update(meas)
+        
+            # else:
+            #     self.robot_sim.command_velocity(0, 0)
+            #     return
 
-            vw = self.diff_drive_controller.compute_vel(state, goal)
-            print("Computed command vel: ", vw)
-            if vw[2] == False:
-                self.robot_sim.command_velocity(vw[0], vw[1])
-                # self.kalman_filter.prediction(vw, imu_meas)
-                if imu_meas != None:
-                    self.kalman_filter.prediction(vw, imu_meas)
-                    self.kalman_filter.update(meas)
-            else:
-                self.robot_sim.command_velocity(0, 0)
-                return
+        est_x = self.kalman_filter.step_filter(vw, imu_meas, meas)
+        print "Get GT Pose: ", self.robot_sim.get_gt_pose()
+        print "EKF Pose: ", est_x
+        self.robot_sim.get_gt_pose()
+        self.robot_sim.set_est_state(est_x)
 
-            est_x = self.kalman_filter.step_filter(vw, imu_meas, meas)
-            print "Get GT Pose: ", self.robot_sim.get_gt_pose()
-            print "EKF Pose: ", est_x
-
-        else:
-            return
-
+        
 def main(args):
     # Load parameters from yaml
     param_path = 'params.yaml'  # rospy.get_param("~param_path")
@@ -134,6 +133,8 @@ def main(args):
         robotControl.process_measurements()
         robotControl.robot_sim.update_frame()
 
+    manager = plt.get_current_fig_manager()
+    manager.window.showMaximized()
     plt.ioff()
     plt.show()
 
