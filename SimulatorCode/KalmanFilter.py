@@ -116,11 +116,11 @@ class KalmanFilter:
 
         if z_t != None and z_t != []:
 
-            for i in range(z_t):
+            for tag in z_t:
                 # retrieve pose of the tag in world frame from the map(markers)
-                tag_w_pose = self.tag_pos(z_t[i, 3])
+                tag_w_pose = self.tag_pos(tag[3])
                 # pose of the tag as measured from the robot
-                tag_r_pose = z_t[i, :3]
+                tag_r_pose = tag[:3]
                 # pose of the robot in the world frame
                 robot_pose = self.robot_pos(tag_w_pose, tag_r_pose)
 
