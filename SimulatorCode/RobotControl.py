@@ -84,48 +84,35 @@ class RobotControl(object):
         imu_meas = self.robot_sim.get_imu()
 
         vw = self.diff_drive_controller.compute_vel(self.state, self.goal)
+        print "VW: ", vw, type(vw)
         print "Running Controller."
         if vw[2] == False:
             self.robot_sim.command_velocity(vw[0], vw[1])
         else:
             self.robot_sim.command_velocity(0, 0)
 
-
-        if imu_meas != None:
-            print "Kalman Filter Predict"
-            self.kalman_filter.prediction(vw, imu_meas)
-
         if meas != None and meas != []:
-            print "Kalman Filter Update"
-            print "Measure: ", meas
-            self.kalman_filter.update(meas)
-            # state = np.array([0.0, 0.0, 0.0])
-            # goal = np.array([meas[0][0], meas[0][1], meas[0][2]])
-            #
-            # vw = self.diff_drive_controller.compute_vel(state, goal)
-            # print("Computed command vel: ", vw)
-            # if vw[2] == False:
-            #     self.robot_sim.command_velocity(vw[0], vw[1])
-            #     # self.kalman_filter.prediction(vw, imu_meas)
+            print("Measurements: ", meas)
+            if imu_meas != None:
+                self.kalman_filter.prediction(vw, imu_meas)
+                self.kalman_filter.update(meas)
 
-
-
-        print "Kalman FIlter Step"
         est_x = self.kalman_filter.step_filter(vw, imu_meas, meas)
         print "Get GT Pose: ", self.robot_sim.get_gt_pose()
-        print "EKF Pose: ", est_x, type(est_x)
-        self.robot_sim.set_est_state(est_x)
+        print "EKF Pose: ", est_x
         self.robot_sim.get_gt_pose()
+        self.robot_sim.set_est_state(est_x)
 
         # Test pose with goal:
-        pos_x_check = ((self.goal.item(0) + self.state_tol) > est_x.item(0)) and \
-                      ((self.goal.item(0) - self.state_tol) < est_x.item(0))
+        print "Types: ", type(self.goal), type(est_x)
+        pos_x_check = ((self.goal[0] + self.state_tol) > est_x.item(0)) and \
+                      ((self.goal[0] - self.state_tol) < est_x.item(0))
 
-        pos_y_check = ((self.goal.item(1) + self.state_tol) > est_x.item(1)) and \
-                      ((self.goal.item(1) - self.state_tol) < est_x.item(1))
+        pos_y_check = ((self.goal[1] + self.state_tol) > est_x.item(1)) and \
+                      ((self.goal[1] - self.state_tol) < est_x.item(1))
 
         if pos_x_check and pos_y_check:
-            if path != []:
+            if self.path != []:
                 self.goal = self.path.pop()
             else:
                 self.goal = est_x

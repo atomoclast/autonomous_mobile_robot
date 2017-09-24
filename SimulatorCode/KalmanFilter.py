@@ -27,7 +27,7 @@ class KalmanFilter:
             moment
         """
         self.markers = markers
-        self.last_time = 0.0 # None  # Used to keep track of time between measurements
+        self.last_time = 0.0  # None  # Used to keep track of time between measurements
         self.Q_t = np.eye(2)
         self.R_t = np.eye(3)
 
@@ -91,7 +91,6 @@ class KalmanFilter:
                                         [omega * dt]])
 
         self.P_t_prediction = (G.dot(self.P_t)).dot(np.transpose(G)) + (N.dot(self.Q_t)).dot(np.transpose(N))
-        print "Predict P T: \n", self.P_t_prediction
         return (self.x_t_prediction, self.P_t_prediction)
 
     def update(self, z_t):
@@ -110,9 +109,9 @@ class KalmanFilter:
         """
          
         H = np.eye(3)
-        print "PT PREDICT: ", self.P_t_prediction, type(self.P_t_prediction)
-        K = (self.P_t_prediction.dot(np.transpose(H))).dot(inv((H.dot(self.P_t_prediction)).dot(np.transpose(H)) + self.R_t))
-
+        print "PT PREDICT: ", self.P_t_prediction
+        K = (self.P_t_prediction.dot(np.transpose(H))).dot(
+            inv((H.dot(self.P_t_prediction)).dot(np.transpose(H)) + self.R_t))
 
         print "Z_T: ", z_t, type(z_t)
 
