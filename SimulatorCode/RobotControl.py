@@ -64,12 +64,14 @@ class RobotControl(object):
         self.kalman_filter = KalmanFilter(world_map)
         self.diff_drive_controller = DiffDriveController(max_speed, max_omega)
         plan = dijkstras(occupancy_map, x_spacing, y_spacing, pos_init, pos_goal)
-        self.state_tol = 0.05
+        self.state_tol = 0.1
         self.path = plan.tolist()
         print "Path: ", self.path, type(self.path)
         self.path.reverse()
+        self.path.pop()
         self.state = pos_init
         self.goal = self.path.pop()
+        print "INIT GOAL: ", self.goal
 
     #     def dijkstras(occupancy_map, x_spacing, y_spacing, start, goal):
 
@@ -98,6 +100,7 @@ class RobotControl(object):
                 self.kalman_filter.update(meas)
 
         est_x = self.kalman_filter.step_filter(vw, imu_meas, meas)
+        self.state = est_x
         print "Get GT Pose: ", self.robot_sim.get_gt_pose()
         print "EKF Pose: ", est_x
         self.robot_sim.get_gt_pose()
