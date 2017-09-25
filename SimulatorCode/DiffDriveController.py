@@ -62,7 +62,11 @@ class DiffDriveController():
         else:
             done = False
         vw = None
-        vw = (v[0], omega[0], done)
+        print "v, omega: ", v, omega, type(omega)
+        if type(omega) != type(1.25):
+            vw = (v[0], omega[0], done)
+        else:
+            vw = (v[0], omega, done)
         print "Diff Controller VW: ", vw
         return vw
 

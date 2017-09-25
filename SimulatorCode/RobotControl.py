@@ -71,6 +71,10 @@ class RobotControl(object):
         self.path.pop()
         self.state = pos_init
         self.goal = self.path.pop()
+        self.x_offset = x_spacing
+        self.vw = (0, 0, False)
+        # self.goal[0] += self.x_offset/2
+        # self.goal[1] += y_spacing
         print "INIT GOAL: ", self.goal
 
     #     def dijkstras(occupancy_map, x_spacing, y_spacing, start, goal):
@@ -85,29 +89,37 @@ class RobotControl(object):
         meas = self.robot_sim.get_measurements()
         imu_meas = self.robot_sim.get_imu()
 
-        vw = self.diff_drive_controller.compute_vel(self.state, self.goal)
-        print "VW: ", vw, type(vw)
+        self.vw = self.diff_drive_controller.compute_vel(self.state, self.goal)
+        print "VW: ", self.vw
         print "Running Controller."
-        if vw[2] == False:
-            self.robot_sim.command_velocity(vw[0], vw[1])
+
+        if self.vw[2] == False:
+            self.robot_sim.command_velocity(self.vw[0], self.vw[1])
         else:
             self.robot_sim.command_velocity(0, 0)
-
-        if meas != None and meas != []:
-            print("Measurements: ", meas)
-            if imu_meas != None:
-                self.kalman_filter.prediction(vw, imu_meas)
-                self.kalman_filter.update(meas)
-
-        est_x = self.kalman_filter.step_filter(vw, imu_meas, meas)
+        
+        est_x = self.kalman_filter.step_filter(self.vw, imu_meas, meas)
+        print "EST X: ", est_x, est_x[2][0]
+        if est_x[2][0] > 2.617991667:
+            est_x[2][0] = 2.617991667
+        if est_x[2][0] < 0.523598333:
+            est_x[2][0] = 0.523598333
         self.state = est_x
         print "Get GT Pose: ", self.robot_sim.get_gt_pose()
         print "EKF Pose: ", est_x
         self.robot_sim.get_gt_pose()
         self.robot_sim.set_est_state(est_x)
+        
+        if imu_meas != None:
+            self.kalman_filter.prediction(self.vw, imu_meas)
 
-        # Test pose with goal:
-        print "Types: ", type(self.goal), type(est_x)
+        if meas != None and meas != []:
+            print("Measurements: ", meas)
+            if imu_meas != None:
+                # self.kalman_filter.prediction(self.vw, imu_meas)
+                self.kalman_filter.update(meas)
+
+
         pos_x_check = ((self.goal[0] + self.state_tol) > est_x.item(0)) and \
                       ((self.goal[0] - self.state_tol) < est_x.item(0))
 
@@ -117,6 +129,8 @@ class RobotControl(object):
         if pos_x_check and pos_y_check:
             if self.path != []:
                 self.goal = self.path.pop()
+                # self.goal[0] += self.x_offset/2
+                # self.goal[1] += y_spacing
             else:
                 self.goal = est_x
 
